@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}— Messages{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-8">
+
+  <h1 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+    <i class="ti ti-message-circle text-green-400"></i> Messages privés
+  </h1>
+
+  <!-- Barre de recherche -->
+  <div class="flex items-center gap-2 bg-gray-900 border border-gray-800
+              rounded-xl px-4 py-2.5 mb-6 focus-within:border-green-600">
+    <i class="ti ti-search text-gray-500 text-sm"></i>
+    <input type="text" placeholder="Rechercher une conversation…"
+           class="bg-transparent flex-1 text-sm text-white
+                  outline-none placeholder-gray-600"/>
+  </div>
+
+  <!-- Liste des conversations -->
+  {% if conversations %}
+    <div class="flex flex-col gap-2">
+      {% for conv in conversations %}
+      <a href="{{ url_for('conversation',
+                 interlocuteur_id=conv['interlocuteur_id']) }}"
+         class="bg-gray-900 border border-gray-800 rounded-2xl p-4
+                flex items-center gap-4 hover:border-gray-700
+                transition group">
+        <div class="w-11 h-11 rounded-full bg-blue-900 text-blue-300
+                    flex items-center justify-center font-semibold
+                    flex-shrink-0">
+          {{ conv['interlocuteur_pseudo'][:2].upper() }}
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex justify-between items-baseline mb-1">
+            <span class="text-sm font-semibold text-white">
+              {{ conv['interlocuteur_pseudo'] }}
+            </span>
+            <span class="text-xs text-gray-600">
+              {{ conv['date_envoi'][:16] }}
+            </span>
+          </div>
+          <p class="text-xs text-gray-500 truncate">
+            {{ conv['contenu'] }}
+          </p>
+        </div>
+        <i class="ti ti-chevron-right text-gray-700
+                  group-hover:text-gray-400 transition"></i>
+      </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="text-center text-gray-600 py-12">
+      <i class="ti ti-message-off text-4xl block mb-2"></i>
+      Aucune conversation pour le moment.
+    </div>
+  {% endif %}
+
+  <!-- Nouveau message -->
+  <div class="mt-8">
+    <h2 class="text-sm font-semibold text-white uppercase
+               tracking-widest mb-4">
+      Démarrer une conversation
+    </h2>
+    <div class="bg-gray-900 border border-gray-800 rounded-2xl p-4">
+      <p class="text-xs text-gray-500 mb-3">
+        Recherchez un utilisateur pour lui envoyer un message.
+      </p>
+      <a href="{{ url_for('recherche') }}"
+         class="flex items-center justify-center gap-2 bg-agora-green
+                text-white text-sm font-semibold py-2.5 rounded-xl
+                hover:opacity-90 transition">
+        <i class="ti ti-search"></i> Rechercher un utilisateur
+      </a>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

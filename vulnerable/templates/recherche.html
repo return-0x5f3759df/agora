@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}— Recherche{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 py-8">
+
+  <h1 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+    <i class="ti ti-search text-green-400"></i> Rechercher un utilisateur
+  </h1>
+
+  <!-- Badge vulnérabilité -->
+  <div class="flex items-start gap-2 bg-red-950 border border-red-800
+              rounded-lg px-3 py-2 text-xs text-red-300 mb-6">
+    <i class="ti ti-alert-triangle text-red-400 mt-0.5 flex-shrink-0"></i>
+    <span>
+      <strong>Injection UNION-based</strong> —
+      Le paramètre de recherche est injecté directement dans une clause LIKE.
+      Essayez : <code class="text-red-400">
+        ' UNION SELECT id,mot_de_passe,email,bio,photo_profil
+        FROM utilisateurs--
+      </code>
+    </span>
+  </div>
+
+  <!-- Formulaire de recherche -->
+  <form method="GET" action="{{ url_for('recherche') }}" class="mb-8">
+    <div class="flex gap-3">
+      <div class="flex-1 flex items-center gap-2 bg-gray-900
+                  border border-gray-700 rounded-xl px-4 py-3
+                  focus-within:border-green-600">
+        <i class="ti ti-search text-gray-500"></i>
+        <input type="text" name="q" value="{{ q }}"
+               placeholder="Rechercher un pseudo…"
+               autofocus
+               class="bg-transparent flex-1 text-sm text-white
+                      outline-none placeholder-gray-600"/>
+      </div>
+      <button type="submit"
+              class="bg-agora-green text-white px-5 py-3 rounded-xl
+                     text-sm font-semibold hover:opacity-90 transition">
+        Rechercher
+      </button>
+    </div>
+  </form>
+
+  <!-- Résultats -->
+  {% if q %}
+    {% if resultats %}
+      <p class="text-xs text-gray-500 mb-4 uppercase tracking-widest">
+        {{ resultats|length }} résultat(s) pour
+        "<span class="text-red-400">{{ q }}</span>"
+      </p>
+      <div class="flex flex-col gap-3">
+        {% for u in resultats %}
+        <div class="bg-gray-900 border border-gray-800 rounded-2xl p-4
+                    flex items-center gap-4 hover:border-gray-700 transition">
+          <div class="w-11 h-11 rounded-full bg-blue-900 text-blue-300
+                      flex items-center justify-center font-semibold
+                      flex-shrink-0">
+            {{ u['pseudo'][:2].upper() if u['pseudo'] else '??' }}
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="text-sm font-semibold text-white">
+              {{ u['pseudo'] }}
+            </div>
+            <div class="text-xs text-gray-500 truncate">
+              {{ u['email'] }}
+            </div>
+            {% if u['bio'] %}
+            <div class="text-xs text-gray-400 mt-1 truncate">
+              {{ u['bio'] }}
+            </div>
+            {% endif %}
+          </div>
+          <a href="{{ url_for('profil', pseudo=u['pseudo']) }}"
+             class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300
+                    px-3 py-1.5 rounded-lg transition flex-shrink-0">
+            Voir le profil
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="text-center text-gray-600 py-12">
+        <i class="ti ti-user-off text-4xl block mb-2"></i>
+        Aucun utilisateur trouvé pour "{{ q }}".
+      </div>
+    {% endif %}
+  {% else %}
+    <div class="text-center text-gray-700 py-12">
+      <i class="ti ti-search text-4xl block mb-2"></i>
+      Tapez un pseudo pour lancer la recherche.
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

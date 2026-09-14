@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block title %}— Publication{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-8">
+
+  <!-- Retour -->
+  <a href="{{ url_for('fil') }}"
+     class="flex items-center gap-1 text-sm text-gray-500
+            hover:text-white mb-6 transition">
+    <i class="ti ti-arrow-left"></i> Retour au fil
+  </a>
+
+  <!-- Badge vulnérabilité -->
+  <div class="flex items-start gap-2 bg-purple-950 border border-purple-800
+              rounded-lg px-3 py-2 text-xs text-purple-300 mb-6">
+    <i class="ti ti-alert-triangle text-purple-400 mt-0.5 flex-shrink-0"></i>
+    <span>
+      <strong>Injection Blind Boolean-based</strong> —
+      L'identifiant de publication dans l'URL est injecté directement.
+      Essayez : <code class="text-red-400">/publication/1 AND 1=1</code>
+      vs <code class="text-red-400">/publication/1 AND 1=2</code>
+    </span>
+  </div>
+
+  <!-- Publication -->
+  <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5 mb-6">
+    <div class="flex gap-3 mb-4">
+      <div class="w-10 h-10 rounded-full bg-blue-900 text-blue-300
+                  flex items-center justify-center font-semibold flex-shrink-0">
+        {{ pub['pseudo'][:2].upper() }}
+      </div>
+      <div>
+        <a href="{{ url_for('profil', pseudo=pub['pseudo']) }}"
+           class="text-sm font-semibold text-white hover:underline">
+          {{ pub['pseudo'] }}
+        </a>
+        <div class="text-xs text-gray-500">
+          {{ pub['date_publication'][:16] }}
+        </div>
+      </div>
+    </div>
+    <p class="text-base text-gray-100 leading-relaxed mb-4">
+      {{ pub['contenu'] }}
+    </p>
+    <div class="flex gap-6 pt-3 border-t border-gray-800">
+      <span class="text-sm text-gray-500">
+        <span class="font-semibold text-white">
+          {{ commentaires|length }}
+        </span> commentaire(s)
+      </span>
+    </div>
+  </div>
+
+  <!-- Commentaires -->
+  <h2 class="text-sm font-semibold text-white uppercase tracking-widest
+             mb-4">
+    Commentaires
+  </h2>
+
+  {% if commentaires %}
+    <div class="flex flex-col gap-3 mb-6">
+      {% for com in commentaires %}
+      <div class="bg-gray-900 border border-gray-800 rounded-xl p-4
+                  flex gap-3">
+        <div class="w-8 h-8 rounded-full bg-green-900 text-green-300
+                    flex items-center justify-center font-semibold
+                    text-xs flex-shrink-0">
+          {{ com['pseudo'][:2].upper() }}
+        </div>
+        <div>
+          <div class="flex items-baseline gap-2 mb-1">
+            <span class="text-sm font-semibold text-white">
+              {{ com['pseudo'] }}
+            </span>
+            <span class="text-xs text-gray-600">
+              {{ com['date_commentaire'][:16] }}
+            </span>
+          </div>
+          <p class="text-sm text-gray-300 leading-relaxed">
+            {{ com['contenu'] }}
+          </p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-gray-600 text-sm mb-6">
+      Aucun commentaire pour le moment. Soyez le premier !
+    </p>
+  {% endif %}
+
+  <!-- Formulaire de commentaire -->
+  <div class="bg-gray-900 border border-gray-800 rounded-2xl p-4">
+    <form method="POST"
+          action="{{ url_for('commenter', pub_id=pub['id']) }}">
+      <div class="flex gap-3">
+        <div class="w-8 h-8 rounded-full bg-green-900 text-green-300
+                    flex items-center justify-center font-semibold
+                    text-xs flex-shrink-0 mt-1">
+          {{ current_user['pseudo'][:2].upper() }}
+        </div>
+        <div class="flex-1">
+          <textarea name="contenu" rows="2"
+                    placeholder="Ajouter un commentaire…"
+                    class="w-full bg-gray-800 border border-gray-700
+                           rounded-xl px-3 py-2 text-sm text-white
+                           placeholder-gray-600 outline-none resize-none
+                           focus:border-green-600 mb-2"></textarea>
+          <div class="flex justify-end">
+            <button type="submit"
+                    class="bg-agora-green text-white text-sm font-semibold
+                           px-4 py-1.5 rounded-full hover:opacity-90">
+              Envoyer
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+</div>
+{% endblock %}

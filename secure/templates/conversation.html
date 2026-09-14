@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block title %}— Conversation avec {{ interlocuteur['pseudo'] }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-6 flex flex-col"
+     style="height: calc(100vh - 160px)">
+
+  <!-- En-tête -->
+  <div class="flex items-center gap-3 mb-4">
+    <a href="{{ url_for('messages') }}"
+       class="text-gray-500 hover:text-white transition">
+      <i class="ti ti-arrow-left text-lg"></i>
+    </a>
+    <div class="w-9 h-9 rounded-full bg-blue-900 text-blue-300
+                flex items-center justify-center font-semibold
+                text-sm flex-shrink-0">
+      {{ interlocuteur['pseudo'][:2].upper() }}
+    </div>
+    <div>
+      <div class="text-sm font-semibold text-white">
+        {{ interlocuteur['pseudo'] }}
+      </div>
+      <div class="text-xs text-green-400 flex items-center gap-1">
+        <span class="w-1.5 h-1.5 rounded-full bg-green-400
+                     inline-block"></span>
+        en ligne
+      </div>
+    </div>
+    <a href="{{ url_for('profil', pseudo=interlocuteur['pseudo']) }}"
+       class="ml-auto text-xs text-gray-500 hover:text-white
+              flex items-center gap-1 transition">
+      <i class="ti ti-user"></i> Voir le profil
+    </a>
+  </div>
+
+  <!-- Zone de messages -->
+  <div class="flex-1 bg-gray-900 border border-gray-800 rounded-2xl
+              p-4 overflow-y-auto flex flex-col gap-3 mb-4"
+       id="messages-zone">
+
+    {% if msgs %}
+      {% for msg in msgs %}
+        {% if msg['expediteur_id'] == current_user['id'] %}
+        <div class="flex gap-2 justify-end">
+          <div class="max-w-xs">
+            <div class="bg-gradient-to-r from-agora-green to-teal-700
+                        text-white text-sm px-4 py-2.5 rounded-2xl
+                        rounded-br-sm leading-relaxed">
+              {{ msg['contenu'] }}
+            </div>
+            <div class="text-xs text-gray-600 text-right mt-1">
+              {{ msg['date_envoi'][11:16] }}
+            </div>
+          </div>
+          <div class="w-7 h-7 rounded-full bg-green-900 text-green-300
+                      flex items-center justify-center font-semibold
+                      text-xs flex-shrink-0 self-end">
+            {{ current_user['pseudo'][:2].upper() }}
+          </div>
+        </div>
+        {% else %}
+        <div class="flex gap-2">
+          <div class="w-7 h-7 rounded-full bg-blue-900 text-blue-300
+                      flex items-center justify-center font-semibold
+                      text-xs flex-shrink-0 self-end">
+            {{ interlocuteur['pseudo'][:2].upper() }}
+          </div>
+          <div class="max-w-xs">
+            <div class="bg-gray-800 text-gray-100 text-sm px-4 py-2.5
+                        rounded-2xl rounded-bl-sm leading-relaxed">
+              {{ msg['contenu'] }}
+            </div>
+            <div class="text-xs text-gray-600 mt-1">
+              {{ msg['date_envoi'][11:16] }}
+            </div>
+          </div>
+        </div>
+        {% endif %}
+      {% endfor %}
+    {% else %}
+      <div class="flex-1 flex items-center justify-center">
+        <div class="text-center text-gray-600">
+          <i class="ti ti-message-circle text-4xl block mb-2"></i>
+          <p class="text-sm">
+            Début de votre conversation avec
+            <span class="text-white">
+              {{ interlocuteur['pseudo'] }}
+            </span>
+          </p>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Formulaire d'envoi -->
+  <form method="POST"
+        action="{{ url_for('envoyer_message',
+                 destinataire_id=interlocuteur['id']) }}"
+        class="flex gap-3">
+    <div class="flex-1 flex items-center gap-2 bg-gray-900
+                border border-gray-800 rounded-xl px-4 py-2.5
+                focus-within:border-green-600">
+      <input type="text" name="contenu"
+             placeholder="Écrire un message…"
+             autocomplete="off"
+             maxlength="1000"
+             class="bg-transparent flex-1 text-sm text-white
+                    outline-none placeholder-gray-600"/>
+    </div>
+    <button type="submit"
+            class="w-10 h-10 bg-agora-green rounded-xl flex items-center
+                   justify-center hover:opacity-90 transition flex-shrink-0">
+      <i class="ti ti-send text-white"></i>
+    </button>
+  </form>
+
+</div>
+
+<script>
+  const zone = document.getElementById("messages-zone");
+  if (zone) zone.scrollTop = zone.scrollHeight;
+</script>
+
+{% endblock %} 

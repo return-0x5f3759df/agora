@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}— Modifier le profil{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto px-4 py-8">
+
+  <h1 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+    <i class="ti ti-pencil text-green-400"></i> Modifier le profil
+  </h1>
+
+  <!-- Badge vulnérabilité second-order étape 2 -->
+  <div class="flex items-start gap-2 bg-orange-950 border border-orange-800
+              rounded-lg px-3 py-2 text-xs text-orange-300 mb-6">
+    <i class="ti ti-alert-triangle text-orange-400 mt-0.5 flex-shrink-0"></i>
+    <span>
+      <strong>Injection Second-Order — Étape 2</strong> —
+      Le pseudo stocké en base est récupéré puis injecté directement
+      dans la requête UPDATE. Si votre pseudo est
+      <code class="text-red-400">admin'--</code>,
+      cette action mettra à jour le compte admin à votre place.
+    </span>
+  </div>
+
+  <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+
+    <!-- Photo de profil -->
+    <div class="flex items-center gap-4 pb-5 mb-5
+                border-b border-gray-800">
+      <div class="w-14 h-14 rounded-full bg-green-900 text-green-300
+                  flex items-center justify-center font-bold text-xl
+                  border-2 border-gray-700">
+        {{ utilisateur['pseudo'][:2].upper() }}
+      </div>
+      <div>
+        <p class="text-sm font-medium text-white mb-1">Photo de profil</p>
+        <label class="cursor-pointer text-xs bg-gray-800
+                      hover:bg-gray-700 text-gray-300 px-3 py-1.5
+                      rounded-lg transition">
+          <i class="ti ti-upload mr-1"></i> Changer la photo
+          <input type="file" name="photo_profil"
+                 accept="image/*" class="hidden"
+                 form="form-profil"/>
+        </label>
+      </div>
+    </div>
+
+    <form id="form-profil" method="POST"
+          action="{{ url_for('modifier_profil') }}"
+          enctype="multipart/form-data"
+          class="flex flex-col gap-5">
+
+      <!-- Pseudo — affiché mais non modifiable ici -->
+      <div>
+        <label class="block text-sm text-gray-400 mb-1.5">
+          Pseudo actuel
+          <span class="text-red-400 text-xs ml-1">
+            ← vecteur second-order
+          </span>
+        </label>
+        <div class="flex items-center gap-2 bg-gray-800
+                    border border-red-900/50 rounded-lg px-3 py-2.5">
+          <i class="ti ti-at text-red-400"></i>
+          <span class="text-sm text-red-300 font-mono">
+            {{ utilisateur['pseudo'] }}
+          </span>
+        </div>
+        <p class="text-xs text-gray-600 mt-1">
+          Ce pseudo sera utilisé dans la requête UPDATE sans traitement.
+        </p>
+      </div>
+
+      <!-- Email -->
+      <div>
+        <label class="block text-sm text-gray-400 mb-1.5">
+          Adresse email
+        </label>
+        <div class="flex items-center gap-2 bg-gray-800
+                    border border-gray-700 rounded-lg px-3 py-2.5
+                    focus-within:border-green-600">
+          <i class="ti ti-mail text-gray-500"></i>
+          <input type="email" name="email"
+                 value="{{ utilisateur['email'] }}"
+                 class="bg-transparent flex-1 text-sm text-white
+                        outline-none"/>
+        </div>
+      </div>
+
+      <!-- Bio -->
+      <div>
+        <label class="block text-sm text-gray-400 mb-1.5">Bio</label>
+        <textarea name="bio" rows="3" maxlength="160"
+                  placeholder="Parlez de vous en quelques mots…"
+                  class="w-full bg-gray-800 border border-gray-700
+                         rounded-lg px-3 py-2.5 text-sm text-white
+                         placeholder-gray-600 outline-none resize-none
+                         focus:border-green-600">{{ utilisateur['bio'] or '' }}</textarea>
+        <p class="text-xs text-gray-600 text-right mt-1">160 caractères max</p>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex gap-3 pt-2">
+        <a href="{{ url_for('profil', pseudo=utilisateur['pseudo']) }}"
+           class="flex-1 text-center bg-gray-800 hover:bg-gray-700
+                  text-gray-300 text-sm py-2.5 rounded-lg transition">
+          Annuler
+        </a>
+        <button type="submit"
+                class="flex-1 bg-gradient-to-r from-agora-green
+                       to-teal-700 text-white text-sm font-semibold
+                       py-2.5 rounded-lg hover:opacity-90 transition">
+          Enregistrer
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+</div>
+{% endblock %}

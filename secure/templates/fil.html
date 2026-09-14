@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% block title %}— Fil d'actualité{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-6 grid grid-cols-12 gap-6">
+
+  <!-- COLONNE CENTRALE -->
+  <div class="col-span-12 lg:col-span-7 flex flex-col gap-4">
+
+    <!-- Composeur de publication -->
+    <div class="bg-gray-900 border border-gray-800 rounded-2xl p-4">
+      <div class="flex gap-3">
+        <div class="w-9 h-9 rounded-full bg-green-900 text-green-300
+                    flex items-center justify-center font-semibold
+                    text-sm flex-shrink-0">
+          {{ current_user['pseudo'][:2].upper() }}
+        </div>
+        <form method="POST" action="{{ url_for('publier') }}"
+              class="flex-1">
+          <textarea name="contenu" rows="2"
+                    placeholder="Quoi de neuf, {{ current_user['pseudo'] }} ?"
+                    maxlength="280"
+                    class="w-full bg-gray-800 border border-gray-700
+                           rounded-xl px-3 py-2 text-sm text-white
+                           placeholder-gray-600 outline-none resize-none
+                           focus:border-green-600 mb-2"></textarea>
+          <div class="flex justify-end">
+            <button type="submit"
+                    class="bg-agora-green text-white text-sm font-semibold
+                           px-4 py-1.5 rounded-full hover:opacity-90">
+              Publier
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Publications -->
+    {% if publications %}
+      {% for pub in publications %}
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-4
+                  hover:border-gray-700 transition">
+        <div class="flex gap-3">
+          <div class="w-9 h-9 rounded-full bg-blue-900 text-blue-300
+                      flex items-center justify-center font-semibold
+                      text-sm flex-shrink-0">
+            {{ pub['pseudo'][:2].upper() }}
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-baseline gap-2 mb-1">
+              <a href="{{ url_for('profil', pseudo=pub['pseudo']) }}"
+                 class="text-sm font-semibold text-white hover:underline">
+                {{ pub['pseudo'] }}
+              </a>
+              <span class="text-xs text-gray-500">
+                {{ pub['date_publication'][:16] }}
+              </span>
+            </div>
+            <p class="text-sm text-gray-200 leading-relaxed mb-3">
+              {{ pub['contenu'] }}
+            </p>
+            <div class="flex gap-4">
+              <a href="{{ url_for('publication', pub_id=pub['id']) }}"
+                 class="flex items-center gap-1 text-xs text-gray-500
+                        hover:text-green-400 transition">
+                <i class="ti ti-message-circle text-base"></i>
+                Commenter
+              </a>
+              <span class="flex items-center gap-1 text-xs text-gray-500">
+                <i class="ti ti-heart text-base"></i>
+                J'aime
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="text-center text-gray-600 py-12">
+        <i class="ti ti-mood-empty text-4xl block mb-2"></i>
+        Aucune publication pour le moment.
+      </div>
+    {% endif %}
+
+  </div>
+
+  <!-- COLONNE DROITE -->
+  <div class="col-span-12 lg:col-span-5 flex flex-col gap-4">
+
+    <!-- Recherche rapide -->
+    <div class="bg-gray-900 border border-gray-800 rounded-2xl p-4">
+      <h3 class="text-sm font-semibold text-white mb-3">Rechercher</h3>
+      <form method="GET" action="{{ url_for('recherche') }}">
+        <div class="flex items-center gap-2 bg-gray-800 border
+                    border-gray-700 rounded-full px-3 py-2
+                    focus-within:border-green-600">
+          <i class="ti ti-search text-gray-500 text-sm"></i>
+          <input type="text" name="q"
+                 placeholder="Rechercher sur Agora…"
+                 class="bg-transparent flex-1 text-sm text-white
+                        outline-none placeholder-gray-600"/>
+        </div>
+      </form>
+    </div>
+
+    <!-- Profil rapide -->
+    <div class="bg-gray-900 border border-gray-800 rounded-2xl p-4">
+      <h3 class="text-sm font-semibold text-white mb-3">Mon profil</h3>
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-green-900 text-green-300
+                    flex items-center justify-center font-semibold">
+          {{ current_user['pseudo'][:2].upper() }}
+        </div>
+        <div>
+          <div class="text-sm font-semibold text-white">
+            {{ current_user['pseudo'] }}
+          </div>
+          <div class="text-xs text-gray-500">
+            {{ current_user['email'] }}
+          </div>
+        </div>
+      </div>
+      <div class="flex gap-2 mt-3">
+        <a href="{{ url_for('profil', pseudo=current_user['pseudo']) }}"
+           class="flex-1 text-center text-xs bg-gray-800
+                  hover:bg-gray-700 text-gray-300 py-1.5
+                  rounded-lg transition">
+          Voir le profil
+        </a>
+        <a href="{{ url_for('modifier_profil') }}"
+           class="flex-1 text-center text-xs bg-agora-green
+                  hover:opacity-90 text-white py-1.5 rounded-lg transition">
+          Modifier
+        </a>
+      </div>
+    </div>
+
+    <!-- Tendances -->
+    <div class="bg-gray-900 border border-gray-800 rounded-2xl p-4">
+      <h3 class="text-sm font-semibold text-white mb-3">Tendances</h3>
+      <div class="flex flex-col gap-2">
+        {% set tendances = [
+          ('#SQLInjection', '142 publications'),
+          ('#Cybersécurité', '98 publications'),
+          ('#Flask',        '61 publications'),
+          ('#OWASP',        '47 publications'),
+        ] %}
+        {% for tag, count in tendances %}
+        <div class="flex justify-between items-center py-1.5
+                    border-b border-gray-800 last:border-0">
+          <span class="text-sm text-green-400 font-medium">{{ tag }}</span>
+          <span class="text-xs text-gray-500">{{ count }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
